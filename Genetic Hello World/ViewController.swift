@@ -52,7 +52,7 @@ class ViewController: UIViewController {
         [[""],[],[],[]],
         [[""],[],[],[]],
         [[""],[],[],[]],
-    ]//[[text,[letter,letter,letter],[capitals],[numeric],[Finess]][][]....
+    ]//[[text],[letter,letter,letter],[capitals],[numeric]][][]....
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -146,9 +146,6 @@ class ViewController: UIViewController {
                             chromosomeFitness[index][0] += 5
                         }
                     }
-                    
-                    
-                    
                 }
             }
         
@@ -188,13 +185,21 @@ class ViewController: UIViewController {
             finalText = text.reduce("",combine:{$0 + $1})
             Label_6.text = finalText
             finalText = chromosome[5][1][0]
-
             
+            let mmm = chromosomeFitness
+            for var index = 0; index < 10; index++ {
+                chromosomeFitness[index][0] = 0
+            }
             generation++
             lblGeneration.text = "Generation: \(generation)"
             
+            if generation == 2{
+                print(mmm)
+            }
+            
             if generation >= 10000{
              loopflag = true
+                print(mmm)
             }
         }
         
