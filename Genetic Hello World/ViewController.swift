@@ -21,6 +21,9 @@ class ViewController: UIViewController {
     @IBOutlet weak var Label_10: UILabel!
     @IBOutlet weak var lblGeneration: UILabel!
     
+    var mmm: [String] = []
+    
+    
     var generation = 0
     var size = 0
     var goalletters: [String] = []
@@ -37,22 +40,22 @@ class ViewController: UIViewController {
         [0,6],
         [0,7],
         [0,8],
-        [0,9],
+        [0,9]
     ]
     var stringGoal: String = "HelloWorld"
     var chromosome: [[[String]]] =
     [
-        [[""],[],[],[]],
-        [[""],[],[],[]],
-        [[""],[],[],[]],
-        [[""],[],[],[]],
-        [[""],[],[],[]],
-        [[""],[],[],[]],
-        [[""],[],[],[]],
-        [[""],[],[],[]],
-        [[""],[],[],[]],
-        [[""],[],[],[]],
-    ]//[[text],[letter,letter,letter],[capitals],[numeric]][][]....
+        [[""],[],[],[],[]],
+        [[""],[],[],[],[]],
+        [[""],[],[],[],[]],
+        [[""],[],[],[],[]],
+        [[""],[],[],[],[]],
+        [[""],[],[],[],[]],
+        [[""],[],[],[],[]],
+        [[""],[],[],[],[]],
+        [[""],[],[],[],[]],
+        [[""],[],[],[],[]],
+    ]//[[text],[letter,letter,letter],[capitals],[numeric],[letter fitness][][]....
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,6 +85,7 @@ class ViewController: UIViewController {
                 chromosome[index][1].append("")
                 chromosome[index][2].append("")
                 chromosome[index][3].append("")
+                chromosome[index][4].append("0")
             }
         }
         
@@ -116,34 +120,38 @@ class ViewController: UIViewController {
                 for var index1 = 0; index1 < chromosome[index][0][0].characters.count; index1++ {// array of each letter in the text
                     //seperate data--------------------------------------------------
                     charIndex = chromosome[index][0][0].startIndex.advancedBy(index1)
-                    chromosome[index][1][index1] = String(chromosome[index][0][0][charIndex])//.append(String(chromosome[index][0][0][charIndex]))
+                    chromosome[index][1][index1] = String(chromosome[index][0][0][charIndex])
                 
                     if chromosome[index][1][index1] == chromosome[index][1][index1].lowercaseString {
-                        chromosome[index][2][index1] = "true" //.append("true")
+                        chromosome[index][2][index1] = "true"
                     } else {
-                        chromosome[index][2][index1] = "false"//.append("false")//going to use string true or false because I am restricted to strings
+                        chromosome[index][2][index1] = "false"//going to use string true or false because I am restricted to strings
                     }
                     
                     if Int(chromosome[index][1][index1]) == nil {
-                        chromosome[index][3][index1] = "false"//.append("false")
+                        chromosome[index][3][index1] = "false"
                     } else {
-                        chromosome[index][3][index1] = "true"//.append("true")
+                        chromosome[index][3][index1] = "true"
                     }
                     
                     //Determine fitness-----------------------------------------------
                     if chromosome[index][1][index1] == goalletters[index1]{
                         chromosomeFitness[index][0] += 20
+                        chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 20)
                     } else {
                         if chromosome[index][1][index1].lowercaseString == goalletters[index1].lowercaseString{//check if it is the letter
                             chromosomeFitness[index][0] += 10
+                            chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 10)
                         }
                         
                         if chromosome[index][2][index1] == String(goalCapitals[index1]) { //check if they match in capitilization
                             chromosomeFitness[index][0] += 5
+                            chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 5)
                         }
                         
                         if chromosome[index][3][index1] == String(goalnumeric[index1]) { //check if they match numericly
                             chromosomeFitness[index][0] += 5
+                            chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 5)
                         }
                     }
                 }
@@ -153,6 +161,13 @@ class ViewController: UIViewController {
             chromosomeFitness = rankFromHighestToLowestNumber(chromosomeFitness)
             
             //start making children---------------------------------------------
+            
+            if generation >= 99 {
+                
+             for var index = 0; index < 10; index++ {
+                    mmm.append(chromosome[index][0][0])
+                }
+            }
             //Elite children
             Label_1.text = chromosome[Int(chromosomeFitness[0][1])][0][0]
             Label_2.text = chromosome[Int(chromosomeFitness[1][1])][0][0]
@@ -160,47 +175,166 @@ class ViewController: UIViewController {
             
             //mutation of elite children
             var text = chromosome[Int(chromosomeFitness[0][1])][1]
-            var randomChanges: [[String]] = [[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)]]
+            var randomChanges: [[String]] = [[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)]]
             text[Int(randomChanges[0][0])!] = randomChanges[0][1]
             text[Int(randomChanges[1][0])!] = randomChanges[1][1]
             text[Int(randomChanges[2][0])!] = randomChanges[2][1]
+            text[Int(randomChanges[3][0])!] = randomChanges[3][1]
+            text[Int(randomChanges[4][0])!] = randomChanges[4][1]
             var finalText = text.reduce("",combine:{$0 + $1})
             Label_4.text = finalText
-            finalText = chromosome[3][1][0]
+            chromosome[3][0][0] = finalText
             
             text = chromosome[Int(chromosomeFitness[1][1])][1]
-            randomChanges = [[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)]]
+            randomChanges = [[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)]]
             text[Int(randomChanges[0][0])!] = randomChanges[0][1]
             text[Int(randomChanges[1][0])!] = randomChanges[1][1]
             text[Int(randomChanges[2][0])!] = randomChanges[2][1]
+            text[Int(randomChanges[3][0])!] = randomChanges[3][1]
+            text[Int(randomChanges[4][0])!] = randomChanges[4][1]
             finalText = text.reduce("",combine:{$0 + $1})
             Label_5.text = finalText
-            finalText = chromosome[4][1][0]
+            chromosome[4][0][0] = finalText
             
             text = chromosome[Int(chromosomeFitness[2][1])][1]
-            randomChanges = [[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)]]
+            randomChanges = [[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)]]
             text[Int(randomChanges[0][0])!] = randomChanges[0][1]
             text[Int(randomChanges[1][0])!] = randomChanges[1][1]
             text[Int(randomChanges[2][0])!] = randomChanges[2][1]
+            text[Int(randomChanges[3][0])!] = randomChanges[3][1]
+            text[Int(randomChanges[4][0])!] = randomChanges[4][1]
             finalText = text.reduce("",combine:{$0 + $1})
             Label_6.text = finalText
-            finalText = chromosome[5][1][0]
+            chromosome[5][0][0] = finalText
             
-            let mmm = chromosomeFitness
-            for var index = 0; index < 10; index++ {
-                chromosomeFitness[index][0] = 0
+            //combine parents
+            var firstParent = chromosome[Int(chromosomeFitness[0][1])]
+            var secondParent = chromosome[Int(arc4random_uniform(3) + 3)]
+            var loopFlag1 = false
+            
+            while loopFlag1 == false {
+                if firstParent == secondParent{
+                    secondParent = chromosome[Int(arc4random_uniform(10))]
+                } else {
+                    loopFlag1 = true
+                }
             }
+            
+            text.removeAll()
+            for var index = 0; index < size; index++ {
+                if firstParent[4][index] >= secondParent[4][index]{
+                    text.append(firstParent[1][index])
+                } else {
+                    text.append(secondParent[1][index])
+                }
+            }
+            finalText = text.reduce("",combine:{$0 + $1})
+            Label_7.text = finalText
+            chromosome[6][0][0] = finalText
+            
+            firstParent = chromosome[Int(chromosomeFitness[1][1])]
+            secondParent = chromosome[Int(arc4random_uniform(10))]
+            loopFlag1 = false
+            
+            while loopFlag1 == false {
+                if firstParent == secondParent{
+                    secondParent = chromosome[Int(arc4random_uniform(10))]
+                } else {
+                    loopFlag1 = true
+                }
+            }
+            
+            text.removeAll()
+            for var index = 0; index < size; index++ {
+                if firstParent[4][index] >= secondParent[4][index]{
+                    text.append(firstParent[1][index])
+                } else {
+                    text.append(secondParent[1][index])
+                }
+            }
+            finalText = text.reduce("",combine:{$0 + $1})
+            Label_8.text = finalText
+            chromosome[7][0][0] = finalText
+            
+            firstParent = chromosome[Int(chromosomeFitness[2][1])]
+            secondParent = chromosome[Int(arc4random_uniform(10))]
+            loopFlag1 = false
+            
+            while loopFlag1 == false {
+                if firstParent == secondParent{
+                    secondParent = chromosome[Int(arc4random_uniform(10))]
+                } else {
+                    loopFlag1 = true
+                }
+            }
+            
+            text.removeAll()
+            for var index = 0; index < size; index++ {
+                if firstParent[4][index] >= secondParent[4][index]{
+                    text.append(firstParent[1][index])
+                } else {
+                    text.append(secondParent[1][index])
+                }
+            }
+            finalText = text.reduce("",combine:{$0 + $1})
+            Label_9.text = finalText
+            chromosome[8][0][0] = finalText
+            
+            firstParent = chromosome[Int(chromosomeFitness[0][1])]
+            secondParent = chromosome[Int(arc4random_uniform(10))]
+            loopFlag1 = false
+            
+            while loopFlag1 == false {
+                if firstParent == secondParent{
+                    secondParent = chromosome[Int(arc4random_uniform(10))]
+                } else {
+                    loopFlag1 = true
+                }
+            }
+            
+            text.removeAll()
+            for var index = 0; index < size; index++ {
+                if firstParent[4][index] >= secondParent[4][index]{
+                    text.append(firstParent[1][index])
+                } else {
+                    text.append(secondParent[1][index])
+                }
+            }
+            randomChanges = [[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)]]
+            text[Int(randomChanges[0][0])!] = randomChanges[0][1]
+            text[Int(randomChanges[1][0])!] = randomChanges[1][1]
+            text[Int(randomChanges[2][0])!] = randomChanges[2][1]
+            text[Int(randomChanges[3][0])!] = randomChanges[3][1]
+            text[Int(randomChanges[4][0])!] = randomChanges[4][1]
+            finalText = text.reduce("",combine:{$0 + $1})
+            Label_10.text = finalText
+            chromosome[9][0][0] = finalText
+            
+            //let mmm = chromosomeFitness
+            chromosomeFitness = [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9]]
+            
             generation++
             lblGeneration.text = "Generation: \(generation)"
             
-            if generation == 2{
+            if generation < 100{
+                for var index = 0; index < 10; index++ {
+                    for var index1 = 0; index1 < size; index1++ {
+                        chromosome[index][4][index1] = "0"
+                    }
+                //print(chromosome[index][4])
+                
+                }
+            } else {
+                loopflag = true
+                for var index = 0; index < 10; index++ {
+                    print("\(index).\(chromosome[index][4])")
+                    print("\(index).\(chromosome[index][0][0])")
+                     print(" ")
+                }
                 print(mmm)
+                
             }
             
-            if generation >= 10000{
-             loopflag = true
-                print(mmm)
-            }
         }
         
         
