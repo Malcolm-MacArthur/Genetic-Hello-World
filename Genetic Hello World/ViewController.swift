@@ -21,9 +21,6 @@ class ViewController: UIViewController {
     @IBOutlet weak var Label_10: UILabel!
     @IBOutlet weak var lblGeneration: UILabel!
     
-    var mmm: [String] = []
-    
-    
     var generation = 0
     var size = 0
     var index = 0
@@ -32,18 +29,7 @@ class ViewController: UIViewController {
     var goalCapitals: [Bool] = []
     var goalnumeric: [Bool] = []
     var chromosomeFitness: [[Double]] =
-    [
-        [0,0],
-        [0,1],
-        [0,2],
-        [0,3],
-        [0,4],
-        [0,5],
-        [0,6],
-        [0,7],
-        [0,8],
-        [0,9]
-    ]
+    [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9]]
     var stringGoal: String = "HelloWorld"
     var chromosome: [[[String]]] =
     [
@@ -119,6 +105,13 @@ class ViewController: UIViewController {
         
         var loopflag = false
         while loopflag == false {
+            for index = 0; index < 10; index++ {
+                if chromosome[index][0][0] == stringGoal {
+                    loopflag = true
+                    break
+                }
+            }
+            
             for index = 0; index < 10; index++ {// array for the 10 labels
                 for index1 = 0; index1 < chromosome[index][0][0].characters.count; index1++ {// array of each letter in the text
                     
@@ -168,158 +161,50 @@ class ViewController: UIViewController {
             //Elite children
             Label_1.text = chromosome[Int(chromosomeFitness[0][1])][0][0]
             newChromosome.append(chromosome[Int(chromosomeFitness[0][1])][0][0])
+            
             Label_2.text = chromosome[Int(chromosomeFitness[1][1])][0][0]
             newChromosome.append(chromosome[Int(chromosomeFitness[1][1])][0][0])
+            
             Label_3.text = chromosome[Int(chromosomeFitness[2][1])][0][0]
             newChromosome.append(chromosome[Int(chromosomeFitness[2][1])][0][0])
             
             //mutation of elite children
-            var text = chromosome[Int(chromosomeFitness[0][1])][1]
-            var randomChanges: [[String]] = [[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)]]
-            text[Int(randomChanges[0][0])!] = randomChanges[0][1]
-            text[Int(randomChanges[1][0])!] = randomChanges[1][1]
-            text[Int(randomChanges[2][0])!] = randomChanges[2][1]
-            text[Int(randomChanges[3][0])!] = randomChanges[3][1]
-            text[Int(randomChanges[4][0])!] = randomChanges[4][1]
-            var finalText = text.reduce("",combine:{$0 + $1})
+            var finalText: String
+            
+            finalText = randomMutation(chromosome[Int(chromosomeFitness[0][1])][1])
             Label_4.text = finalText
             newChromosome.append(finalText)
             
-            text = chromosome[Int(chromosomeFitness[1][1])][1]
-            randomChanges = [[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)]]
-            text[Int(randomChanges[0][0])!] = randomChanges[0][1]
-            text[Int(randomChanges[1][0])!] = randomChanges[1][1]
-            text[Int(randomChanges[2][0])!] = randomChanges[2][1]
-            text[Int(randomChanges[3][0])!] = randomChanges[3][1]
-            text[Int(randomChanges[4][0])!] = randomChanges[4][1]
-            finalText = text.reduce("",combine:{$0 + $1})
+            finalText = randomMutation(chromosome[Int(chromosomeFitness[1][1])][1])
             Label_5.text = finalText
             newChromosome.append(finalText)
             
-            text = chromosome[Int(chromosomeFitness[2][1])][1]
-            randomChanges = [[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)]]
-            text[Int(randomChanges[0][0])!] = randomChanges[0][1]
-            text[Int(randomChanges[1][0])!] = randomChanges[1][1]
-            text[Int(randomChanges[2][0])!] = randomChanges[2][1]
-            text[Int(randomChanges[3][0])!] = randomChanges[3][1]
-            text[Int(randomChanges[4][0])!] = randomChanges[4][1]
-            finalText = text.reduce("",combine:{$0 + $1})
+            finalText = randomMutation(chromosome[Int(chromosomeFitness[2][1])][1])
             Label_6.text = finalText
             newChromosome.append(finalText)
             
             //combine parents
-            var firstParent = chromosome[Int(chromosomeFitness[0][1])]
-            var secondParent = chromosome[Int(arc4random_uniform(10))]
-            var loopFlag1 = false
-            
-            while loopFlag1 == false {
-                if firstParent == secondParent{
-                    secondParent = chromosome[Int(arc4random_uniform(10))]
-                } else {
-                    loopFlag1 = true
-                }
-            }
-            
-            text.removeAll()
-            for index = 0; index < size; index++ {
-                if Int(firstParent[4][index]) >= Int(secondParent[4][index]) {
-                    text.append(firstParent[1][index])
-                } else {
-                    text.append(secondParent[1][index])
-                }
-            }
-            finalText = text.reduce("",combine:{$0 + $1})
+            finalText = combineWithRandomParent(chromosome[Int(chromosomeFitness[0][1])], addRandomMutation: false)
             Label_7.text = finalText
             newChromosome.append(finalText)
             
-            firstParent = chromosome[Int(chromosomeFitness[1][1])]
-            secondParent = chromosome[Int(arc4random_uniform(10))]
-            loopFlag1 = false
-            
-            while loopFlag1 == false {
-                if firstParent == secondParent{
-                    secondParent = chromosome[Int(arc4random_uniform(10))]
-                } else {
-                    loopFlag1 = true
-                }
-            }
-            
-            text.removeAll()
-            for index = 0; index < size; index++ {
-                if Int(firstParent[4][index]) >= Int(secondParent[4][index]) {
-                    text.append(firstParent[1][index])
-                } else {
-                    text.append(secondParent[1][index])
-                }
-            }
-            finalText = text.reduce("",combine:{$0 + $1})
+            finalText = combineWithRandomParent(chromosome[Int(chromosomeFitness[1][1])], addRandomMutation: false)
             Label_8.text = finalText
             newChromosome.append(finalText)
             
-            firstParent = chromosome[Int(chromosomeFitness[2][1])]
-            secondParent = chromosome[Int(arc4random_uniform(10))]
-            loopFlag1 = false
-            
-            while loopFlag1 == false {
-                if firstParent == secondParent{
-                    secondParent = chromosome[Int(arc4random_uniform(10))]
-                } else {
-                    loopFlag1 = true
-                }
-            }
-            
-            text.removeAll()
-            for index = 0; index < size; index++ {
-                if Int(firstParent[4][index]) >= Int(secondParent[4][index]) {
-                    text.append(firstParent[1][index])
-                } else {
-                    text.append(secondParent[1][index])
-                }
-            }
-            finalText = text.reduce("",combine:{$0 + $1})
+            finalText = combineWithRandomParent(chromosome[Int(chromosomeFitness[2][1])], addRandomMutation: false)
             Label_9.text = finalText
             newChromosome.append(finalText)
             
-            firstParent = chromosome[Int(chromosomeFitness[0][1])]
-            secondParent = chromosome[Int(arc4random_uniform(10))]
-            loopFlag1 = false
-            
-            while loopFlag1 == false {
-                if firstParent == secondParent{
-                    secondParent = chromosome[Int(arc4random_uniform(10))]
-                } else {
-                    loopFlag1 = true
-                }
-            }
-            
-            text.removeAll()
-            for index = 0; index < size; index++ {
-                if Int(firstParent[4][index]) >= Int(secondParent[4][index]){
-                    text.append(firstParent[1][index])
-                } else {
-                    text.append(secondParent[1][index])
-                }
-            }
-            randomChanges = [[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)]]
-            text[Int(randomChanges[0][0])!] = randomChanges[0][1]
-            text[Int(randomChanges[1][0])!] = randomChanges[1][1]
-            text[Int(randomChanges[2][0])!] = randomChanges[2][1]
-            text[Int(randomChanges[3][0])!] = randomChanges[3][1]
-            text[Int(randomChanges[4][0])!] = randomChanges[4][1]
-            finalText = text.reduce("",combine:{$0 + $1})
+            //combine parents and mutate
+            finalText = combineWithRandomParent(chromosome[Int(chromosomeFitness[0][1])], addRandomMutation: true)
             Label_10.text = finalText
             newChromosome.append(finalText)
-            
-            chromosomeFitness = [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9]]
             
             generation++
             lblGeneration.text = "Generation: \(generation)"
             
-            for index = 0; index < 10; index++ {
-                if chromosome[index][0][0] == stringGoal {
-                    loopflag = true
-                }
-            }
+
             
             if generation < 1000 {
                 for index = 0; index < size; index++ {
@@ -336,6 +221,7 @@ class ViewController: UIViewController {
             }
             
             newChromosome.removeAll()
+            chromosomeFitness = [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9]]
         }
     }
 
@@ -384,8 +270,47 @@ class ViewController: UIViewController {
         return arrangedArray
     }
     
-    //func randomChanges1() -> [String] {
+    func randomMutation(var letters: [String]) -> String {
+        var changes: [[String]] = [[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)]]
+        letters[Int(changes[0][0])!] = changes[0][1]
+        letters[Int(changes[1][0])!] = changes[1][1]
+        letters[Int(changes[2][0])!] = changes[2][1]
+        letters[Int(changes[3][0])!] = changes[3][1]
+        letters[Int(changes[4][0])!] = changes[4][1]
+        let word = letters.reduce("",combine:{$0 + $1})
         
-    //}
+        return word
+    }
+    
+    func combineWithRandomParent(firstParent: [[String]], addRandomMutation: Bool) -> String {
+        var loopFlag = false
+        var newLetters: [String] = []
+        var word: String
+        var secondParent = chromosome[Int(arc4random_uniform(10))]
+        
+        while loopFlag == false {
+            if firstParent == secondParent{
+                secondParent = chromosome[Int(arc4random_uniform(10))]
+            } else {
+                loopFlag = true
+            }
+        }
+        
+        for index = 0; index < size; index++ {
+            if Int(firstParent[4][index]) >= Int(secondParent[4][index]) {
+                newLetters.append(firstParent[1][index])
+            } else {
+                newLetters.append(secondParent[1][index])
+            }
+        }
+        
+        if addRandomMutation == true {
+            word = randomMutation(newLetters)
+        } else {
+            word = newLetters.reduce("",combine:{$0 + $1})
+        }
+        
+        return word
+    }
 }
 
