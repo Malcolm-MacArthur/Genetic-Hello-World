@@ -26,6 +26,8 @@ class ViewController: UIViewController {
     
     var generation = 0
     var size = 0
+    var index = 0
+    var index1 = 0
     var goalletters: [String] = []
     var goalCapitals: [Bool] = []
     var goalnumeric: [Bool] = []
@@ -56,12 +58,13 @@ class ViewController: UIViewController {
         [[""],[],[],[],[]],
         [[""],[],[],[],[]],
     ]//[[text],[letter,letter,letter],[capitals],[numeric],[letter fitness][][]....
+    var newChromosome: [String] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         var charIndex: String.CharacterView.Index
-        for var index = 0; index < stringGoal.characters.count; index++ {
+        for index = 0; index < stringGoal.characters.count; index++ {
             charIndex = stringGoal.startIndex.advancedBy(index)
             goalletters.append(String(stringGoal[charIndex]))
             
@@ -80,8 +83,8 @@ class ViewController: UIViewController {
         
         //Create random population--------------------------
         size = stringGoal.characters.count
-        for var index = 0; index < 10; index++ {
-            for var index1 = 0; index1 < size; index1++ {
+        for index = 0; index < 10; index++ {
+            for index1 = 0; index1 < size; index1++ {
                 chromosome[index][1].append("")
                 chromosome[index][2].append("")
                 chromosome[index][3].append("")
@@ -116,16 +119,17 @@ class ViewController: UIViewController {
         
         var loopflag = false
         while loopflag == false {
-            for var index = 0; index < 10; index++ {// array for the 10 labels
-                for var index1 = 0; index1 < chromosome[index][0][0].characters.count; index1++ {// array of each letter in the text
+            for index = 0; index < 10; index++ {// array for the 10 labels
+                for index1 = 0; index1 < chromosome[index][0][0].characters.count; index1++ {// array of each letter in the text
+                    
                     //seperate data--------------------------------------------------
                     charIndex = chromosome[index][0][0].startIndex.advancedBy(index1)
                     chromosome[index][1][index1] = String(chromosome[index][0][0][charIndex])
                 
                     if chromosome[index][1][index1] == chromosome[index][1][index1].lowercaseString {
-                        chromosome[index][2][index1] = "true"
+                        chromosome[index][2][index1] = "false"
                     } else {
-                        chromosome[index][2][index1] = "false"//going to use string true or false because I am restricted to strings
+                        chromosome[index][2][index1] = "true"//going to use string true or false because I am restricted to strings
                     }
                     
                     if Int(chromosome[index][1][index1]) == nil {
@@ -140,13 +144,13 @@ class ViewController: UIViewController {
                         chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 20)
                     } else {
                         if chromosome[index][1][index1].lowercaseString == goalletters[index1].lowercaseString{//check if it is the letter
-                            chromosomeFitness[index][0] += 10
-                            chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 10)
+                            chromosomeFitness[index][0] += 8
+                            chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 8)
                         }
                         
                         if chromosome[index][2][index1] == String(goalCapitals[index1]) { //check if they match in capitilization
-                            chromosomeFitness[index][0] += 5
-                            chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 5)
+                            chromosomeFitness[index][0] += 7
+                            chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 7)
                         }
                         
                         if chromosome[index][3][index1] == String(goalnumeric[index1]) { //check if they match numericly
@@ -156,22 +160,18 @@ class ViewController: UIViewController {
                     }
                 }
             }
-        
+            
             //compare fitness--------------------------------------------------
             chromosomeFitness = rankFromHighestToLowestNumber(chromosomeFitness)
             
             //start making children---------------------------------------------
-            
-            if generation >= 99 {
-                
-             for var index = 0; index < 10; index++ {
-                    mmm.append(chromosome[index][0][0])
-                }
-            }
             //Elite children
             Label_1.text = chromosome[Int(chromosomeFitness[0][1])][0][0]
+            newChromosome.append(chromosome[Int(chromosomeFitness[0][1])][0][0])
             Label_2.text = chromosome[Int(chromosomeFitness[1][1])][0][0]
+            newChromosome.append(chromosome[Int(chromosomeFitness[1][1])][0][0])
             Label_3.text = chromosome[Int(chromosomeFitness[2][1])][0][0]
+            newChromosome.append(chromosome[Int(chromosomeFitness[2][1])][0][0])
             
             //mutation of elite children
             var text = chromosome[Int(chromosomeFitness[0][1])][1]
@@ -183,7 +183,7 @@ class ViewController: UIViewController {
             text[Int(randomChanges[4][0])!] = randomChanges[4][1]
             var finalText = text.reduce("",combine:{$0 + $1})
             Label_4.text = finalText
-            chromosome[3][0][0] = finalText
+            newChromosome.append(finalText)
             
             text = chromosome[Int(chromosomeFitness[1][1])][1]
             randomChanges = [[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)]]
@@ -194,7 +194,7 @@ class ViewController: UIViewController {
             text[Int(randomChanges[4][0])!] = randomChanges[4][1]
             finalText = text.reduce("",combine:{$0 + $1})
             Label_5.text = finalText
-            chromosome[4][0][0] = finalText
+            newChromosome.append(finalText)
             
             text = chromosome[Int(chromosomeFitness[2][1])][1]
             randomChanges = [[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)],[String(arc4random_uniform(UInt32(size))), randomAlphaNumericString(1)]]
@@ -205,11 +205,11 @@ class ViewController: UIViewController {
             text[Int(randomChanges[4][0])!] = randomChanges[4][1]
             finalText = text.reduce("",combine:{$0 + $1})
             Label_6.text = finalText
-            chromosome[5][0][0] = finalText
+            newChromosome.append(finalText)
             
             //combine parents
             var firstParent = chromosome[Int(chromosomeFitness[0][1])]
-            var secondParent = chromosome[Int(arc4random_uniform(3) + 3)]
+            var secondParent = chromosome[Int(arc4random_uniform(10))]
             var loopFlag1 = false
             
             while loopFlag1 == false {
@@ -221,8 +221,8 @@ class ViewController: UIViewController {
             }
             
             text.removeAll()
-            for var index = 0; index < size; index++ {
-                if firstParent[4][index] >= secondParent[4][index]{
+            for index = 0; index < size; index++ {
+                if Int(firstParent[4][index]) >= Int(secondParent[4][index]) {
                     text.append(firstParent[1][index])
                 } else {
                     text.append(secondParent[1][index])
@@ -230,7 +230,7 @@ class ViewController: UIViewController {
             }
             finalText = text.reduce("",combine:{$0 + $1})
             Label_7.text = finalText
-            chromosome[6][0][0] = finalText
+            newChromosome.append(finalText)
             
             firstParent = chromosome[Int(chromosomeFitness[1][1])]
             secondParent = chromosome[Int(arc4random_uniform(10))]
@@ -245,8 +245,8 @@ class ViewController: UIViewController {
             }
             
             text.removeAll()
-            for var index = 0; index < size; index++ {
-                if firstParent[4][index] >= secondParent[4][index]{
+            for index = 0; index < size; index++ {
+                if Int(firstParent[4][index]) >= Int(secondParent[4][index]) {
                     text.append(firstParent[1][index])
                 } else {
                     text.append(secondParent[1][index])
@@ -254,7 +254,7 @@ class ViewController: UIViewController {
             }
             finalText = text.reduce("",combine:{$0 + $1})
             Label_8.text = finalText
-            chromosome[7][0][0] = finalText
+            newChromosome.append(finalText)
             
             firstParent = chromosome[Int(chromosomeFitness[2][1])]
             secondParent = chromosome[Int(arc4random_uniform(10))]
@@ -269,8 +269,8 @@ class ViewController: UIViewController {
             }
             
             text.removeAll()
-            for var index = 0; index < size; index++ {
-                if firstParent[4][index] >= secondParent[4][index]{
+            for index = 0; index < size; index++ {
+                if Int(firstParent[4][index]) >= Int(secondParent[4][index]) {
                     text.append(firstParent[1][index])
                 } else {
                     text.append(secondParent[1][index])
@@ -278,7 +278,7 @@ class ViewController: UIViewController {
             }
             finalText = text.reduce("",combine:{$0 + $1})
             Label_9.text = finalText
-            chromosome[8][0][0] = finalText
+            newChromosome.append(finalText)
             
             firstParent = chromosome[Int(chromosomeFitness[0][1])]
             secondParent = chromosome[Int(arc4random_uniform(10))]
@@ -293,8 +293,8 @@ class ViewController: UIViewController {
             }
             
             text.removeAll()
-            for var index = 0; index < size; index++ {
-                if firstParent[4][index] >= secondParent[4][index]{
+            for index = 0; index < size; index++ {
+                if Int(firstParent[4][index]) >= Int(secondParent[4][index]){
                     text.append(firstParent[1][index])
                 } else {
                     text.append(secondParent[1][index])
@@ -308,36 +308,35 @@ class ViewController: UIViewController {
             text[Int(randomChanges[4][0])!] = randomChanges[4][1]
             finalText = text.reduce("",combine:{$0 + $1})
             Label_10.text = finalText
-            chromosome[9][0][0] = finalText
+            newChromosome.append(finalText)
             
-            //let mmm = chromosomeFitness
             chromosomeFitness = [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9]]
             
             generation++
             lblGeneration.text = "Generation: \(generation)"
             
-            if generation < 100{
-                for var index = 0; index < 10; index++ {
+            for index = 0; index < 10; index++ {
+                if chromosome[index][0][0] == stringGoal {
+                    loopflag = true
+                }
+            }
+            
+            if generation < 1000 {
+                for index = 0; index < size; index++ {
+                    chromosome[index][0][0] = newChromosome[index]
                     for var index1 = 0; index1 < size; index1++ {
                         chromosome[index][4][index1] = "0"
                     }
-                //print(chromosome[index][4])
-                
                 }
             } else {
                 loopflag = true
-                for var index = 0; index < 10; index++ {
-                    print("\(index).\(chromosome[index][4])")
-                    print("\(index).\(chromosome[index][0][0])")
-                     print(" ")
+                for index = 0; index < 10; index++ {
+                    
                 }
-                print(mmm)
-                
             }
             
+            newChromosome.removeAll()
         }
-        
-        
     }
 
     override func didReceiveMemoryWarning() {
@@ -362,12 +361,12 @@ class ViewController: UIViewController {
     
     func rankFromHighestToLowestNumber(numbers: [[Double]]) -> [[Double]] {
         var arrangedArray: [[Double]] = [[],[],[],[],[],[],[],[],[],[]]
-        for var index = 0; index < 10; index++ {
+        for index = 0; index < 10; index++ {
             
             var rank = 0
             var loopflag1 = false
             
-            for var index1 = 0; index1 < 10; index1++ {
+            for index1 = 0; index1 < 10; index1++ {
                 if index != index1 && numbers[index][0] < numbers[index1][0]{
                     rank++
                 }
@@ -384,5 +383,9 @@ class ViewController: UIViewController {
         }
         return arrangedArray
     }
+    
+    //func randomChanges1() -> [String] {
+        
+    //}
 }
 
