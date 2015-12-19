@@ -20,17 +20,21 @@ class ViewController: UIViewController {
     @IBOutlet weak var Label_9: UILabel!
     @IBOutlet weak var Label_10: UILabel!
     @IBOutlet weak var lblGeneration: UILabel!
+    @IBOutlet weak var txtGoal: UITextField!
+    @IBOutlet weak var mainButton: UIButton!
+
     
     var generation = 0
     var size = 0
     var index = 0
     var index1 = 0
+    var started = false
     var newChildrenTimer = NSTimer()
     var goalletters: [String] = []
     var goalCapitals: [Bool] = []
     var goalnumeric: [Bool] = []
     var chromosomeFitness: [[Double]] = [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9]]
-    var stringGoal: String = "HelloWorld"
+    var stringGoal: String = ""
     var chromosome: [[[String]]] =
     [
         [[""],[],[],[],[]],
@@ -48,64 +52,83 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        var charIndex: String.CharacterView.Index
-        for index = 0; index < stringGoal.characters.count; index++ {
-            charIndex = stringGoal.startIndex.advancedBy(index)
-            goalletters.append(String(stringGoal[charIndex]))
-            
-            if goalletters[index] == goalletters[index].lowercaseString {
-                goalCapitals.append(false)
-            } else {
-                goalCapitals.append(true)
-            }
-            
-            if Int(goalletters[index]) == nil {
-                goalnumeric.append(false)
-            } else {
-                goalnumeric.append(true)
-            }
-        }
-        
-        //Create random population--------------------------
-        size = stringGoal.characters.count
-        for index = 0; index < 10; index++ {
-            for index1 = 0; index1 < size; index1++ {
-                chromosome[index][1].append("")
-                chromosome[index][2].append("")
-                chromosome[index][3].append("")
-                chromosome[index][4].append("0")
-            }
-        }
-        
-        Label_1.text = randomAlphaNumericString(size)
-        Label_2.text = randomAlphaNumericString(size)
-        Label_3.text = randomAlphaNumericString(size)
-        Label_4.text = randomAlphaNumericString(size)
-        Label_5.text = randomAlphaNumericString(size)
-        Label_6.text = randomAlphaNumericString(size)
-        Label_7.text = randomAlphaNumericString(size)
-        Label_8.text = randomAlphaNumericString(size)
-        Label_9.text = randomAlphaNumericString(size)
-        Label_10.text = randomAlphaNumericString(size)
-        
-        chromosome[0][0][0] = Label_1.text!
-        chromosome[1][0][0] = Label_2.text!
-        chromosome[2][0][0] = Label_3.text!
-        chromosome[3][0][0] = Label_4.text!
-        chromosome[4][0][0] = Label_5.text!
-        chromosome[5][0][0] = Label_6.text!
-        chromosome[6][0][0] = Label_7.text!
-        chromosome[7][0][0] = Label_8.text!
-        chromosome[8][0][0] = Label_9.text!
-        chromosome[9][0][0] = Label_10.text!
-        
-        generation++
-        lblGeneration.text = "Generation: \(generation)"
-        
-        newChildrenTimer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: "newChildren", userInfo: nil, repeats: true)
+
     }
 
+    @IBAction func startAndStop(sender: AnyObject) {
+        if started == false {
+            mainButton.setTitle("Cancel", forState: .Normal)
+            started = true
+            
+            generation = 0
+            goalletters.removeAll()
+            goalCapitals.removeAll()
+            goalnumeric.removeAll()
+            stringGoal = txtGoal.text!
+            
+            
+            var charIndex: String.CharacterView.Index
+            for index = 0; index < stringGoal.characters.count; index++ {
+                charIndex = stringGoal.startIndex.advancedBy(index)
+                goalletters.append(String(stringGoal[charIndex]))
+                
+                if goalletters[index] == goalletters[index].lowercaseString {
+                    goalCapitals.append(false)
+                } else {
+                    goalCapitals.append(true)
+                }
+                
+                if Int(goalletters[index]) == nil {
+                    goalnumeric.append(false)
+                } else {
+                    goalnumeric.append(true)
+                }
+            }
+            
+            //Create random population--------------------------
+            size = stringGoal.characters.count
+            for index = 0; index < 10; index++ {
+                for index1 = 0; index1 < size; index1++ {
+                    chromosome[index][1].append("")
+                    chromosome[index][2].append("")
+                    chromosome[index][3].append("")
+                    chromosome[index][4].append("0")
+                }
+            }
+            
+            Label_1.text = randomAlphaNumericString(size)
+            Label_2.text = randomAlphaNumericString(size)
+            Label_3.text = randomAlphaNumericString(size)
+            Label_4.text = randomAlphaNumericString(size)
+            Label_5.text = randomAlphaNumericString(size)
+            Label_6.text = randomAlphaNumericString(size)
+            Label_7.text = randomAlphaNumericString(size)
+            Label_8.text = randomAlphaNumericString(size)
+            Label_9.text = randomAlphaNumericString(size)
+            Label_10.text = randomAlphaNumericString(size)
+            
+            chromosome[0][0][0] = Label_1.text!
+            chromosome[1][0][0] = Label_2.text!
+            chromosome[2][0][0] = Label_3.text!
+            chromosome[3][0][0] = Label_4.text!
+            chromosome[4][0][0] = Label_5.text!
+            chromosome[5][0][0] = Label_6.text!
+            chromosome[6][0][0] = Label_7.text!
+            chromosome[7][0][0] = Label_8.text!
+            chromosome[8][0][0] = Label_9.text!
+            chromosome[9][0][0] = Label_10.text!
+            
+            generation++
+            lblGeneration.text = "Generation: \(generation)"
+            
+            newChildrenTimer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: "newChildren", userInfo: nil, repeats: true)
+        } else {
+            mainButton.setTitle("Start", forState: .Normal)
+            started = false
+            newChildrenTimer.invalidate()
+        }
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -117,7 +140,9 @@ class ViewController: UIViewController {
         for index = 0; index < 10; index++ {
             if chromosome[index][0][0] == stringGoal {
                 newChildrenTimer.invalidate()
-                break
+                mainButton.setTitle("Start", forState: .Normal)
+                started = false
+                return
             }
         }
         
@@ -216,7 +241,7 @@ class ViewController: UIViewController {
         lblGeneration.text = "Generation: \(generation)"
         
         if generation < 1000 {
-            for index = 0; index < size; index++ {
+            for index = 0; index < 10; index++ {
                 chromosome[index][0][0] = newChromosome[index]
                 for var index1 = 0; index1 < size; index1++ {
                     chromosome[index][4][index1] = "0"
@@ -235,7 +260,7 @@ class ViewController: UIViewController {
 
     func randomAlphaNumericString(length: Int) -> String {
         
-        let allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        let allowedChars = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         let allowedCharsCount = UInt32(allowedChars.characters.count)
         var randomString = ""
         
