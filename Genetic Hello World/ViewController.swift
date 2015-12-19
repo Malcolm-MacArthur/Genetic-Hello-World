@@ -25,11 +25,11 @@ class ViewController: UIViewController {
     var size = 0
     var index = 0
     var index1 = 0
+    var newChildrenTimer = NSTimer()
     var goalletters: [String] = []
     var goalCapitals: [Bool] = []
     var goalnumeric: [Bool] = []
-    var chromosomeFitness: [[Double]] =
-    [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9]]
+    var chromosomeFitness: [[Double]] = [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9]]
     var stringGoal: String = "HelloWorld"
     var chromosome: [[[String]]] =
     [
@@ -103,131 +103,134 @@ class ViewController: UIViewController {
         generation++
         lblGeneration.text = "Generation: \(generation)"
         
-        var loopflag = false
-        while loopflag == false {
-            for index = 0; index < 10; index++ {
-                if chromosome[index][0][0] == stringGoal {
-                    loopflag = true
-                    break
-                }
-            }
-            
-            for index = 0; index < 10; index++ {// array for the 10 labels
-                for index1 = 0; index1 < chromosome[index][0][0].characters.count; index1++ {// array of each letter in the text
-                    
-                    //seperate data--------------------------------------------------
-                    charIndex = chromosome[index][0][0].startIndex.advancedBy(index1)
-                    chromosome[index][1][index1] = String(chromosome[index][0][0][charIndex])
-                
-                    if chromosome[index][1][index1] == chromosome[index][1][index1].lowercaseString {
-                        chromosome[index][2][index1] = "false"
-                    } else {
-                        chromosome[index][2][index1] = "true"//going to use string true or false because I am restricted to strings
-                    }
-                    
-                    if Int(chromosome[index][1][index1]) == nil {
-                        chromosome[index][3][index1] = "false"
-                    } else {
-                        chromosome[index][3][index1] = "true"
-                    }
-                    
-                    //Determine fitness-----------------------------------------------
-                    if chromosome[index][1][index1] == goalletters[index1]{
-                        chromosomeFitness[index][0] += 20
-                        chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 20)
-                    } else {
-                        if chromosome[index][1][index1].lowercaseString == goalletters[index1].lowercaseString{//check if it is the letter
-                            chromosomeFitness[index][0] += 8
-                            chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 8)
-                        }
-                        
-                        if chromosome[index][2][index1] == String(goalCapitals[index1]) { //check if they match in capitilization
-                            chromosomeFitness[index][0] += 7
-                            chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 7)
-                        }
-                        
-                        if chromosome[index][3][index1] == String(goalnumeric[index1]) { //check if they match numericly
-                            chromosomeFitness[index][0] += 5
-                            chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 5)
-                        }
-                    }
-                }
-            }
-            
-            //compare fitness--------------------------------------------------
-            chromosomeFitness = rankFromHighestToLowestNumber(chromosomeFitness)
-            
-            //start making children---------------------------------------------
-            //Elite children
-            Label_1.text = chromosome[Int(chromosomeFitness[0][1])][0][0]
-            newChromosome.append(chromosome[Int(chromosomeFitness[0][1])][0][0])
-            
-            Label_2.text = chromosome[Int(chromosomeFitness[1][1])][0][0]
-            newChromosome.append(chromosome[Int(chromosomeFitness[1][1])][0][0])
-            
-            Label_3.text = chromosome[Int(chromosomeFitness[2][1])][0][0]
-            newChromosome.append(chromosome[Int(chromosomeFitness[2][1])][0][0])
-            
-            //mutation of elite children
-            var finalText: String
-            
-            finalText = randomMutation(chromosome[Int(chromosomeFitness[0][1])][1])
-            Label_4.text = finalText
-            newChromosome.append(finalText)
-            
-            finalText = randomMutation(chromosome[Int(chromosomeFitness[1][1])][1])
-            Label_5.text = finalText
-            newChromosome.append(finalText)
-            
-            finalText = randomMutation(chromosome[Int(chromosomeFitness[2][1])][1])
-            Label_6.text = finalText
-            newChromosome.append(finalText)
-            
-            //combine parents
-            finalText = combineWithRandomParent(chromosome[Int(chromosomeFitness[0][1])], addRandomMutation: false)
-            Label_7.text = finalText
-            newChromosome.append(finalText)
-            
-            finalText = combineWithRandomParent(chromosome[Int(chromosomeFitness[1][1])], addRandomMutation: false)
-            Label_8.text = finalText
-            newChromosome.append(finalText)
-            
-            finalText = combineWithRandomParent(chromosome[Int(chromosomeFitness[2][1])], addRandomMutation: false)
-            Label_9.text = finalText
-            newChromosome.append(finalText)
-            
-            //combine parents and mutate
-            finalText = combineWithRandomParent(chromosome[Int(chromosomeFitness[0][1])], addRandomMutation: true)
-            Label_10.text = finalText
-            newChromosome.append(finalText)
-            
-            generation++
-            lblGeneration.text = "Generation: \(generation)"
-            
-
-            
-            if generation < 1000 {
-                for index = 0; index < size; index++ {
-                    chromosome[index][0][0] = newChromosome[index]
-                    for var index1 = 0; index1 < size; index1++ {
-                        chromosome[index][4][index1] = "0"
-                    }
-                }
-            } else {
-                loopflag = true
-                for index = 0; index < 10; index++ {
-                    
-                }
-            }
-            
-            newChromosome.removeAll()
-            chromosomeFitness = [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9]]
-        }
+        newChildrenTimer = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: "newChildren", userInfo: nil, repeats: true)
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func newChildren() {
+        var charIndex: String.CharacterView.Index
+        
+        for index = 0; index < 10; index++ {
+            if chromosome[index][0][0] == stringGoal {
+                newChildrenTimer.invalidate()
+                break
+            }
+        }
+        
+        for index = 0; index < 10; index++ {// array for the 10 labels
+            for index1 = 0; index1 < chromosome[index][0][0].characters.count; index1++ {// array of each letter in the text
+                
+                //seperate data--------------------------------------------------
+                charIndex = chromosome[index][0][0].startIndex.advancedBy(index1)
+                chromosome[index][1][index1] = String(chromosome[index][0][0][charIndex])
+                
+                if chromosome[index][1][index1] == chromosome[index][1][index1].lowercaseString {
+                    chromosome[index][2][index1] = "false"
+                } else {
+                    chromosome[index][2][index1] = "true"//going to use string true or false because I am restricted to strings
+                }
+                
+                if Int(chromosome[index][1][index1]) == nil {
+                    chromosome[index][3][index1] = "false"
+                } else {
+                    chromosome[index][3][index1] = "true"
+                }
+                
+                //Determine fitness-----------------------------------------------
+                if chromosome[index][1][index1] == goalletters[index1]{
+                    chromosomeFitness[index][0] += 20
+                    chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 20)
+                } else {
+                    if chromosome[index][1][index1].lowercaseString == goalletters[index1].lowercaseString{//check if it is the letter
+                        chromosomeFitness[index][0] += 8
+                        chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 8)
+                    }
+                    
+                    if chromosome[index][2][index1] == String(goalCapitals[index1]) { //check if they match in capitilization
+                        chromosomeFitness[index][0] += 7
+                        chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 7)
+                    }
+                    
+                    if chromosome[index][3][index1] == String(goalnumeric[index1]) { //check if they match numericly
+                        chromosomeFitness[index][0] += 5
+                        chromosome[index][4][index1] = String(Int(chromosome[index][4][index1])! + 5)
+                    }
+                }
+            }
+        }
+        
+        //compare fitness--------------------------------------------------
+        chromosomeFitness = rankFromHighestToLowestNumber(chromosomeFitness)
+        
+        //start making children---------------------------------------------
+        var finalText: String
+        
+        //Elite children
+        Label_1.text = chromosome[Int(chromosomeFitness[0][1])][0][0]
+        newChromosome.append(chromosome[Int(chromosomeFitness[0][1])][0][0])
+        
+        //combine parents
+        finalText = combineWithRandomParent(chromosome[Int(chromosomeFitness[0][1])], addRandomMutation: false)
+        Label_2.text = finalText
+        newChromosome.append(finalText)
+        
+        finalText = combineWithRandomParent(chromosome[Int(chromosomeFitness[0][1])], addRandomMutation: false)
+        Label_3.text = finalText
+        newChromosome.append(finalText)
+        
+        finalText = combineWithRandomParent(chromosome[Int(chromosomeFitness[0][1])], addRandomMutation: false)
+        Label_4.text = finalText
+        newChromosome.append(finalText)
+        
+        //combine elite parents and mutate
+        finalText = combineWithRandomParent(chromosome[Int(chromosomeFitness[0][1])], addRandomMutation: true)
+        Label_5.text = finalText
+        newChromosome.append(finalText)
+        
+        finalText = combineWithRandomParent(chromosome[Int(chromosomeFitness[0][1])], addRandomMutation: true)
+        Label_6.text = finalText
+        newChromosome.append(finalText)
+        
+        finalText = combineWithRandomParent(chromosome[Int(chromosomeFitness[0][1])], addRandomMutation: true)
+        Label_7.text = finalText
+        newChromosome.append(finalText)
+        
+        //mutation of elite children
+        finalText = randomMutation(chromosome[Int(chromosomeFitness[0][1])][1])
+        Label_8.text = finalText
+        newChromosome.append(finalText)
+        
+        finalText = randomMutation(chromosome[Int(chromosomeFitness[0][1])][1])
+        Label_9.text = finalText
+        newChromosome.append(finalText)
+        
+        finalText = randomMutation(chromosome[Int(chromosomeFitness[0][1])][1])
+        Label_10.text = finalText
+        newChromosome.append(finalText)
+        
+        generation++
+        lblGeneration.text = "Generation: \(generation)"
+        
+        if generation < 1000 {
+            for index = 0; index < size; index++ {
+                chromosome[index][0][0] = newChromosome[index]
+                for var index1 = 0; index1 < size; index1++ {
+                    chromosome[index][4][index1] = "0"
+                }
+            }
+        } else {
+            newChildrenTimer.invalidate()
+            for index = 0; index < 10; index++ {
+                
+            }
+        }
+        
+        newChromosome.removeAll()
+        chromosomeFitness = [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9]]
     }
 
     func randomAlphaNumericString(length: Int) -> String {
